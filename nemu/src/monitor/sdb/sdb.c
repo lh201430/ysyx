@@ -3,6 +3,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
@@ -18,7 +19,7 @@ static char* rl_gets() {
     line_read = NULL;
   }
 
-  line_read = readline("(nemu) ");
+  line_read = readline("(nemu) ");// 使用readline()函数从键盘上读入命令. 
 
   if (line_read && *line_read) {
     add_history(line_read);
@@ -39,6 +40,30 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_si(char *args){
+printf("++++++++++++++++++++++++++++++++\n");
+ char *temp = strtok(args," ");
+ int number = atoi(temp);
+cpu_exec(number);
+return 0;
+}
+
+
+static int cmd_info(char *args){
+isa_reg_display();
+return 0;
+}
+
+static int cmd_x (char *args){
+  int number;
+  paddr_t address;
+  sscanf(args,"%d %x",&number,&address);
+   for(int i=0;i<number;i++){
+     printf("0x%02lx ",paddr_read(address+i,1));
+   }
+  return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -47,7 +72,9 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
+  {"si","single step execution", cmd_si},
+  {"info","Print register status", cmd_info},
+  {"x","Scan memory", cmd_x},
   /* TODO: Add more commands */
 
 };

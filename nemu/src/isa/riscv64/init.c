@@ -19,10 +19,10 @@ static void restart() {
   cpu.gpr[0] = 0;
 }
 
-void init_isa() {
+void init_isa() {  //初始化寄存器, 
   /* Load built-in image. */
   memcpy(guest_to_host(RESET_VECTOR), img, sizeof(img));
-
   /* Initialize this virtual computer system. */
   restart();
+  
 }
