@@ -2,13 +2,19 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "memory/paddr.h"
 #include "sdb.h"
-#include <memory/paddr.h>
+
+
+
 
 static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
+char *new_wp();
+void free_wp();
+void infoWP();
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -50,11 +56,19 @@ return 0;
 
 
 static int cmd_info(char *args){
-isa_reg_display();
+
+char* temp = strtok(args," "); 
+printf("%s",temp);
+if (!strcmp(temp,"r")){
+  isa_reg_display();
+}else if(!strcmp(temp,"w")){
+  infoWP();
+}
+
 return 0;
 }
 
-static int cmd_x (char *args){
+static int cmd_x(char *args){
   int number;
   paddr_t address;
   sscanf(args,"%d %x",&number,&address);
@@ -63,6 +77,27 @@ static int cmd_x (char *args){
    }
   return 0;
 }
+
+static int cmd_p (char *args){
+  bool a= false;
+ int b= expr(args,&a);
+  printf("最后值为%d",b);
+  return 0;
+}
+
+static int cmd_w(char *args){
+char *temp = strtok(args," ");
+new_wp(temp);
+return 0;
+}
+
+static int cmd_d(char *args){
+ char *temp = strtok(args," ");
+ int number = atoi(temp);
+ free_wp(number);
+return 0;
+}
+
 
 static struct {
   const char *name;
@@ -75,6 +110,9 @@ static struct {
   {"si","single step execution", cmd_si},
   {"info","Print register status", cmd_info},
   {"x","Scan memory", cmd_x},
+  {"p","The expression evaluates",cmd_p},
+  {"w","Watchpoints", cmd_w},
+  {"d","delete Watchpoints",cmd_d},
   /* TODO: Add more commands */
 
 };

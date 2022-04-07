@@ -9,6 +9,7 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
+  //	printf("%s,%ld\n", "pc",cpu.pc);
   for (int i = 0; i < 32; i++){
 		printf("%s,%ld\n", *(regs + i),cpu.gpr[i]);
 	}
@@ -18,5 +19,8 @@ void isa_reg_display() {
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+  if(!strcmp(s,"pc")){
+    return cpu.pc;
+  }
   return 0;
 }
